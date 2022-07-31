@@ -5,67 +5,51 @@
     License: MIT license
   ]]
 
-local g3d = require "g3d"
+local gameState,
+      titleState,
+      playState
 
-local obj
-local timer = 0
-local onPress = false
+function setState(state)
+
+    if state == "title" then
+        love.mouse.setRelativeMode(false)
+        titleState = require("game/title"):new()
+        gameState = titleState
+
+    elseif state == "play" then
+        love.mouse.setRelativeMode(true)
+        playState = require("game/play"):new()
+        gameState = playState
+
+    end
+end
 
 function love.load()
-
-    obj = {
-
-        background = require("objects/background"):new(),
-        player = require("objects/player"):new(10,0,-8),
-        obstacle = require("objects/obstacle"):new(10,0,12),
-        hud = require("objects/hud"):new()
-
-    }
-
-    love.mouse.setRelativeMode(true)
-
+    setState("title")
 end
 
 function love.update(dt)
-
-    timer = timer + dt
 
     if love.keyboard.isDown("escape") then
         love.event.push("quit")
     end
 
-    obj.background:update(dt)
-    obj.player:update(dt)
-    obj.obstacle:update(dt, obj.player.position, obj.player.outOfScreen)
-    obj.hud:update(obj.player.score)
+    gameState:update(dt)
 
-    if obj.obstacle.active[2] ~= nil then
+end
 
-        if obj.obstacle.active[2] then
-             obj.player.score = obj.player.score + 100
-        else obj.player.lives = obj.player.lives - 1 end
-
-        obj.obstacle.active[2] = nil
-
-    end
-
-    g3d.camera.lookInDirection() -- Refresh view
-
+function love.mousepressed(x,y,dx,dy)
+    gameState:mousePressed(x,y,dx,dy)
 end
 
 function love.mousemoved(x,y,dx,dy)
-    -- obj.background:tmMoved(x,y,dx,dy)
-    obj.player:move(dx,true)
+    gameState:mouseMoved(x,y,dx,dy)
+end
+
+function love.mousereleased(x,y,dx,dy)
+    gameState:mouseReleased(x,y,dx,dy)
 end
 
 function love.draw()
-    obj.background:draw()
-    obj.player:draw()
-    obj.obstacle:draw()
-    obj.hud:draw(obj.player.lives)
-end
-
-function love.resize()
-    g3d.camera.aspectRatio = love.graphics.getWidth()/love.graphics.getHeight()
-    -- G3DShader:send("projectionMatrix", GetProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio))
+    gameState:draw()
 end
