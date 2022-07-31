@@ -26,21 +26,23 @@ function titleState:new()
 end
 
 function titleState:update(dt)
+
+    -- Random color of title --
+
     if self.title[4] > .25 then
-        self.title[3][1] = math.random()
-        self.title[3][2] = math.random()
-        self.title[3][3] = math.random()
-        self.title[4] = 0
+        for i = 1, 3 do
+            self.title[3][i] = math.random()
+        end self.title[4] = 0
     else
         self.title[4] = self.title[4] + dt
     end
 
+    -- Launch of the game with fade to black --
+
     if self.startGame[1] then
-        if self.startGame[2] > 1 then
-            setState("play")
-        else
+        if self.startGame[2] < 1 then
             self.startGame[2] = self.startGame[2] + dt
-        end
+        else setState("play") end
     end
 
 end
