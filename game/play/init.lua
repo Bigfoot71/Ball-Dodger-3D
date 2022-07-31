@@ -46,6 +46,8 @@ function playState:update(dt)
 
     g3d.camera.lookInDirection() -- Refresh view
 
+    -- Fade to "white" on startup --
+
     if self.startUp[1] then
         if self.startUp[2] > 0 then
             self.startUp[2] = self.startUp[2] - dt 
